@@ -1,86 +1,89 @@
 "use client";
 import { useEffect, useState } from "react";
 
-export default function Dashboard() {
-  const [tickets, setTickets] = useState([]);
+// Tipe Data untuk Type Safety
+interface Ticket {
+  id: number;
+  title: string;
+  description: string;
+  submitted_by: string;
+  status: string;
+  urgency_level: string | null;
+  severity_score: number | null;
+  reasoning: string | null;
+}
 
-  // Fungsi mengambil data dari FastAPI
+export default function Dashboard() {
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+
   const fetchTickets = async () => {
     try {
       const res = await fetch("http://localhost:8000/api/tickets/");
       const data = await res.json();
       setTickets(data);
-    } catch (error) {
-      console.error("Gagal mengambil data:", error);
-    }
+    } catch (err) { console.error(err); }
   };
 
   useEffect(() => {
     fetchTickets();
-    const interval = setInterval(fetchTickets, 3000); // Refresh tiap 3 detik (Otomatis!)
+    const interval = setInterval(fetchTickets, 5000); // POLLING (Requirement Hal 4)
     return () => clearInterval(interval);
   }, []);
 
+  const getUrgencyColor = (level: string | null) => {
+    switch (level) {
+      case "Critical": return "bg-red-600 text-white";
+      case "High": return "bg-orange-500 text-white";
+      case "Medium": return "bg-blue-500 text-white";
+      case "Low": return "bg-green-500 text-white";
+      default: return "bg-gray-500 text-white";
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#0f172a] text-white p-10 font-sans">
+    <main className="min-h-screen bg-slate-950 text-slate-50 p-8 font-sans">
       <div className="max-w-5xl mx-auto">
-        <header className="flex justify-between items-center mb-10 border-b border-slate-700 pb-6">
-          <div>
-            <h1 className="text-4xl font-extrabold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
-              🎫 AI Ticket Triage
-            </h1>
-            <p className="text-slate-400 mt-2">Monitoring tiket yang dianalisis oleh AI Llama 3</p>
-          </div>
-          <div className="text-right text-xs text-slate-500 bg-slate-800/50 p-3 rounded-lg border border-slate-700">
-            Backend: <span className="text-green-400 font-mono">http://localhost:8000</span>
-          </div>
-        </header>
+        <h1 className="text-3xl font-bold mb-8 border-b border-slate-800 pb-4 flex items-center gap-3">
+          <span className="bg-blue-600 p-2 rounded-lg">🎫</span> AI Ticket Triage Dashboard
+        </h1>
 
         <div className="grid gap-6">
-          {tickets.map((t: any) => (
-            <div key={t.id} className="bg-[#1e293b] p-6 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition-all shadow-xl group">
-              <div className="flex justify-between items-start">
+          {tickets.map((ticket) => (
+            <div key={ticket.id} className="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl hover:border-slate-700 transition">
+              <div className="flex justify-between items-start mb-4">
                 <div>
-                  <h3 className="text-xl font-bold group-hover:text-blue-400 transition-colors">{t.title}</h3>
-                  <p className="text-slate-400 text-sm mt-1">ID: #{t.id} | Diajukan oleh: <span className="text-slate-200">{t.submitted_by}</span></p>
-                  <p className="text-slate-300 mt-4 italic text-sm">"{t.description}"</p>
+                  <h2 className="text-xl font-bold text-slate-100">{ticket.title}</h2>
+                  <p className="text-slate-500 text-sm italic">By {ticket.submitted_by} • ID: #{ticket.id}</p>
                 </div>
-
-                <div className="flex flex-col gap-3 items-end">
+                <div className="flex gap-2">
                   {/* Status Badge */}
-                  <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${t.status === 'completed' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30 animate-pulse'
-                    }`}>
-                    {t.status}
+                  <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                    ticket.status === 'analyzed' ? 'border-emerald-500 text-emerald-500' : 'border-amber-500 text-amber-500 animate-pulse'
+                  }`}>
+                    {ticket.status}
                   </span>
-
-                  {/* Urgency Badge (Hanya muncul jika sudah dianalisis AI) */}
-                  {t.urgency_level && (
-                    <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${t.urgency_level === 'Critical' ? 'bg-red-500 text-white shadow-lg shadow-red-500/50' :
-                        t.urgency_level === 'High' ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                      }`}>
-                      Urgency: {t.urgency_level}
+                  
+                  {/* Urgency Badge (Requirement Hal 4) */}
+                  {ticket.urgency_level && (
+                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${getUrgencyColor(ticket.urgency_level)}`}>
+                      {ticket.urgency_level} ({ticket.severity_score})
                     </span>
                   )}
                 </div>
               </div>
-
-              {/* Reasoning AI (Hanya muncul jika sudah selesai) */}
-              {t.reasoning && (
-                <div className="mt-6 pt-4 border-t border-slate-700/50">
-                  <p className="text-[11px] text-slate-500 uppercase font-bold tracking-widest mb-2">Analisis AI Reasoning:</p>
-                  <p className="text-slate-400 text-sm leading-relaxed">{t.reasoning}</p>
+              <p className="text-slate-400 text-sm line-clamp-2 mb-4">"{ticket.description}"</p>
+              
+              {/* Reasoning Section */}
+              {ticket.reasoning && (
+                <div className="bg-slate-950/50 p-4 rounded-xl border border-slate-800/50">
+                  <p className="text-[10px] font-bold text-slate-600 uppercase mb-2">AI Analysis Reasoning</p>
+                  <p className="text-sm text-slate-300 leading-relaxed">{ticket.reasoning}</p>
                 </div>
               )}
             </div>
           ))}
-
-          {tickets.length === 0 && (
-            <div className="text-center py-20 bg-slate-800/20 rounded-3xl border border-dashed border-slate-700">
-              <p className="text-slate-500 italic">Belum ada tiket masuk ke database.</p>
-            </div>
-          )}
         </div>
       </div>
-    </div>
+    </main>
   );
 }
