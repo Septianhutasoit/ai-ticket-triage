@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: ticket-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: ticket_triage
+      MYSQL_USER: ticket_user
+      MYSQL_PASSWORD: ticket_pass
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 10s
+      retries: 5
+
+  n8n:
+    image: n8nio/n8n:1.123.22
+    container_name: ticket-n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - NODE_ENV=production
+      - WEBHOOK_URL=http://localhost:5678/
+      - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
+      - N8N_BLOCK_NODES=n8n-nodes-base.executeCommand,n8n-nodes-base.ssh
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+volumes:
+  mysql_data:
+  n8n_data:
