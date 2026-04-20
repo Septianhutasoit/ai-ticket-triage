@@ -20,6 +20,7 @@ Sistem otomatisasi triage tiket menggunakan AI (Llama 3 via Groq) untuk mengklas
 2. **Backend**:
    - `cd backend`
    - `python -m venv venv && .\venv\Scripts\activate`
+   - .\venv\Scripts\Activate.ps1
    - `pip install -r requirements.txt`
    - `uvicorn app.main:app --reload`
 3. **Frontend**:
