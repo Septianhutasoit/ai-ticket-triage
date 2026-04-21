@@ -1,15 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Mengabaikan error HMR yang mengganggu di browser
+  // Menghilangkan pesan error HMR yang mengganggu
   devIndicators: {
     appIsrStatus: false,
   },
-  // Memaksa koneksi stabil ke localhost
-  serverRuntimeConfig: {
-    host: 'localhost',
-    port: 3000,
-  },
+  // Menambahkan izin host sesuai saran error terminal Anda
+  experimental: {
+    allowedDevOrigins: ['127.0.0.1', 'localhost', '169.254.28.69']
+  }
 };
 
 export default nextConfig;
