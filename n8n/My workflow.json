@@ -1,0 +1,139 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ticket-triage",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -352,
+        -32
+      ],
+      "id": "3d63e032-c3ff-4aab-8843-3cce0cb39845",
+      "name": "Webhook",
+      "webhookId": "253b6730-d664-4dde-b366-b1a76829d4a4"
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\n  // 1. Ambil teks jawaban dari AI Cohere\n  const text = $input.first().json.text;\n  \n  // 2. Cari pola JSON di dalam teks (mencari di antara { dan })\n  const jsonMatch = text.match(/\\{[\\s\\S]*\\}/);\n  \n  if (jsonMatch) {\n    const parsed = JSON.parse(jsonMatch[0]);\n    \n    // Kita buat pemetaan agar lebih fleksibel (handle jika AI pakai huruf kecil/besar)\n    const urgency = parsed.urgency_level || parsed.urgency || \"Medium\";\n    const score = parsed.severity_score || parsed.severity || 50;\n    const reason = parsed.reasoning || parsed.reason || parsed.explanation || \"Analyzed by AI\";\n\n    return {\n      ticket_id: $('Webhook').first().json.body.ticket_id,\n      urgency_level: urgency,\n      severity_score: parseInt(score),\n      reasoning: reason\n    };\n  }\n  \n  throw new Error(\"Format JSON tidak ditemukan oleh Regex\");\n\n} catch (error) {\n  // ERROR HANDLING (Sesuai dokumen pengerjaan Halaman 4)\n  return {\n    ticket_id: $('Webhook').first().json.body.ticket_id,\n    urgency_level: \"Unknown\",\n    severity_score: 0,\n    reasoning: \"AI Response Error: \" + error.message\n  };\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        80,
+        -32
+      ],
+      "id": "f3cc1360-1ad1-42c6-bb1f-ced209fffae9",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=http://host.docker.internal:8000/api/tickets/{{ $node[\"Webhook\"].json[\"body\"][\"ticket_id\"] }}/analysis",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"urgency_level\": \"{{ $json.urgency_level }}\",\n  \"severity_score\": {{ $json.severity_score }},\n  \"reasoning\": \"{{ $json.reasoning }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        304,
+        -32
+      ],
+      "id": "2af4b46d-1579-4c68-a7c1-0f0b329e6800",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cohere.ai/v1/chat",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer PuxqDQKy4dYEvfEF2g2nGsTVBUHOUDQrr7Tsec7J"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"command-r-08-2024\",\n  \"message\": \"Analyze this support ticket. Return ONLY valid JSON. Ticket Title: {{ $node['Webhook'].json.body.title }} Description: {{ $node['Webhook'].json.body.description }}\",\n  \"temperature\": 0.2\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -144,
+        -32
+      ],
+      "id": "dc1fb2e3-c0a7-46f1-a704-d75f89544255",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "977045b2-43aa-46c3-be1e-958d9efee831",
+  "meta": {
+    "instanceId": "a80e689057c253e3502efbf4a7350299e2f2ef817610cf604e04951b03b88194"
+  },
+  "id": "vHvb55m5b8hz0nXx",
+  "tags": []
+}
