@@ -50,3 +50,14 @@ Tabel Utama: **`tickets`**
 Jalankan MySQL dan n8n dalam satu perintah:
 ```bash
 docker-compose up -d
+
+## 📸 Dokumentasi Sistem
+
+### Dashboard Utama (Next.js)
+![Dashboard UI](screenshots/dashboard.png)
+
+### Otomasi Workflow (n8n)
+![n8n Workflow](screenshots/n8n-flow.png)
+
+### Dokumentasi API (FastAPI Swagger)
+![Swagger UI](screenshots/swagger.png)
