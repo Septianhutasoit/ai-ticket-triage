@@ -1,63 +1,111 @@
-# AI-Powered Support Ticket Triage System
+<div align="center">
 
-Sistem otomatisasi triage tiket support berbasis AI yang mampu menerima tiket, melakukan klasifikasi tingkat urgensi secara otomatis menggunakan LLM Agent, dan menampilkan hasilnya melalui dashboard real-time. Proyek ini dibangun untuk memenuhi kriteria Technical Assessment Junior Developer.
+<img src="https://img.shields.io/badge/Next.js-15.0-black?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js" />
+<img src="https://img.shields.io/badge/FastAPI-0.115-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI" />
+<img src="https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL" />
+<img src="https://img.shields.io/badge/n8n-1.123-EA4B71?style=for-the-badge&logo=n8n&logoColor=white" alt="n8n" />
+<img src="https://img.shields.io/badge/Cohere-Command_R-39594E?style=for-the-badge&logo=cohere&logoColor=white" alt="Cohere" />
+<img src="https://img.shields.io/badge/Docker-27.0-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
+<img src="https://img.shields.io/badge/Tailwind-3.4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind" />
+<img src="https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
 
-## 🚀 Fitur Utama
-- **Automated AI Triage**: Klasifikasi otomatis tingkat urgensi (Low, Medium, High, Critical) menggunakan Cohere Command-R LLM.
-- **Real-time Dashboard**: Monitoring status tiket (Pending -> Analyzed) dengan fitur Live Polling otomatis.
-- **AI Reasoning**: Penjelasan logis dari AI untuk setiap klasifikasi yang dilakukan.
-- **Modern UI/UX**: Dashboard responsif dengan Dark Mode, badge warna dinamis, dan fitur "Read More" untuk deskripsi panjang.
-- **System Logging**: Pencatatan setiap aktivitas sistem untuk audit dan monitoring.
+<br />
+<br />
 
-## 🛠️ Tech Stack
-- **Frontend**: Next.js 15 (App Router), Tailwind CSS, TypeScript.
-- **Backend**: FastAPI (Python 3.13), SQLAlchemy ORM, Pydantic.
-- **Database**: MySQL 8.0 (Containerized).
-- **Workflow Automation**: n8n (Containerized).
-- **LLM Agent**: Cohere AI (Model: `command-r-08-2024`).
+<h1>🎫 AI-Powered Support Ticket Triage System</h1>
 
-## 📊 Physical Data Model (PDM)
-Tabel Utama: **`tickets`**
-| Field | Type | Description |
-| :--- | :--- | :--- |
-| `id` | INT (PK) | Primary Key, Auto Increment. |
-| `title` | VARCHAR(255)| Judul tiket masalah. |
-| `description` | TEXT | Detail deskripsi masalah. |
-| `submitted_by` | VARCHAR(255)| Nama/Email pelapor. |
-| `status` | ENUM | `pending` atau `analyzed`. |
-| `urgency_level`| VARCHAR(50) | Klasifikasi AI (Low, Medium, High, Critical). |
-| `severity_score`| INT | Skor tingkat keparahan 1-100. |
-| `reasoning` | TEXT | Penjelasan logis hasil analisis AI. |
-| `created_at` | TIMESTAMP | Waktu pembuatan tiket. |
+<p>
+  <strong>Automated · Intelligent · Real-time</strong>
+  <br />
+  Sistem triase tiket support otomatis berbasis AI yang mengklasifikasikan urgensi secara real-time.
+  <br />
+  <sub>Built for Junior Developer Technical Assessment</sub>
+</p>
 
-## 🔄 Activity Diagram (System Flow)
-1. **User** mengisi form tiket di **Next.js Frontend**.
-2. **FastAPI** menerima request, menyimpan data ke **MySQL** (`status: pending`), dan mengirim trigger **Webhook** ke n8n.
-3. **n8n Workflow** menerima data tiket dan mengirimkan kontennya ke **Cohere AI** dengan prompt terstruktur.
-4. **LLM Agent** menghasilkan output JSON berupa tingkat urgensi, skor, dan alasan analisis.
-5. **n8n** melakukan callback **PATCH** ke endpoint FastAPI.
-6. **FastAPI** mengupdate data di database dan mengubah status menjadi `analyzed`.
-7. **Next.js Dashboard** memperbarui tampilan secara otomatis melalui **Live Polling**.
+<p>
+  <a href="#-demo-preview"><strong>Demo</strong></a> ·
+  <a href="#-fitur-unggulan"><strong>Fitur</strong></a> ·
+  <a href="#-tech-stack"><strong>Tech Stack</strong></a> ·
+  <a href="#-system-flow"><strong>Flow</strong></a> ·
+  <a href="#-quick-start"><strong>Quick Start</strong></a> ·
+  <a href="#-dokumentasi-visual"><strong>Screenshots</strong></a>
+</p>
 
-## 📦 Panduan Instalasi & Penggunaan
+<br />
 
-### 1. Prasyarat
-- Docker & Docker Desktop terinstal.
-- Python 3.13+ terinstal.
-- Node.js terinstal.
+---
 
-### 2. Setup Infrastruktur (Docker)
-Jalankan MySQL dan n8n dalam satu perintah:
-```bash
-docker-compose up -d
+## ✨ **Fitur Unggulan**
 
-## 📸 Dokumentasi Sistem
+<table>
+  <tr>
+    <td width="50%">
+      <h3>🤖 AI-Powered Triage</h3>
+      <p>Klasifikasi otomatis tingkat urgensi menggunakan <strong>Cohere Command-R</strong> dengan akurasi tinggi. Output mencakup urgency level, severity score, dan reasoning logis.</p>
+    </td>
+    <td width="50%">
+      <h3>📊 Real-time Dashboard</h3>
+      <p>Monitoring status tiket secara <strong>live polling</strong> setiap 5 detik. Badge warna dinamis untuk setiap level urgensi dengan animasi transisi halus.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <h3>🎨 Modern UI/UX</h3>
+      <p>Dark mode, skeleton loading, expandable text ("Read More"), dan responsive design menggunakan <strong>Tailwind CSS</strong> dengan animasi micro-interactions.</p>
+    </td>
+    <td width="50%">
+      <h3>🔧 System Logging</h3>
+      <p>Pencatatan otomatis setiap aktivitas sistem untuk keperluan audit, debugging, dan monitoring performa.</p>
+    </td>
+  </tr>
+</table>
 
-### Dashboard Utama (Next.js)
-![Dashboard UI](screenshots/dashboard.png)
+<br />
 
-### Otomasi Workflow (n8n)
-![n8n Workflow](screenshots/n8n-flow.png)
+---
 
-### Dokumentasi API (FastAPI Swagger)
-![Swagger UI](screenshots/swagger.png)
+## 🛠️ **Tech Stack**
+
+<div align="center">
+
+| **Layer** | **Technology** | **Version** | **Description** |
+| :---: | :--- | :---: | :--- |
+| 🎨 **Frontend** | Next.js (App Router) | 15.0 | React framework dengan SSR & SSG |
+| | Tailwind CSS | 3.4 | Utility-first CSS framework |
+| | TypeScript | 5.0 | Static type checking |
+| ⚙️ **Backend** | FastAPI | 0.115 | High-performance Python API |
+| | SQLAlchemy | 2.0 | Python SQL toolkit & ORM |
+| | Pydantic | 2.10 | Data validation & settings |
+| 🗄️ **Database** | MySQL | 8.0 | Relational database |
+| 🔄 **Workflow** | n8n | 1.123 | Automation & orchestration |
+| 🧠 **AI Agent** | Cohere Command-R | 08-2024 | LLM for text classification |
+| 🐳 **Container** | Docker & Docker Compose | 27.0 | Containerization |
+
+</div>
+
+<br />
+
+---
+
+## 🔄 **System Flow**
+
+```mermaid
+sequenceDiagram
+    participant U as 👤 User
+    participant F as ⚛️ Next.js<br/>Frontend
+    participant B as 🐍 FastAPI<br/>Backend
+    participant D as 🗄️ MySQL<br/>Database
+    participant N as 🔄 n8n<br/>Workflow
+    participant AI as 🧠 Cohere<br/>LLM Agent
+
+    U->>F: 1. Submit Ticket Form
+    F->>B: POST /tickets
+    B->>D: INSERT (status: pending)
+    B-->>N: Webhook Trigger
+    N->>AI: Prompt + Ticket Content
+    AI-->>N: JSON (urgency, score, reasoning)
+    N->>B: PATCH /tickets/{id}/analysis
+    B->>D: UPDATE (status: analyzed)
+    F-->>U: 7. Dashboard (Live Polling)
+    
+    Note over F,D: Dashboard auto-refresh setiap 5 detik
