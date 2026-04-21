@@ -26,7 +26,7 @@ Sistem otomatisasi triage tiket menggunakan AI (Llama 3 via Groq) untuk mengklas
 3. **Frontend**:
    - `cd frontend`
    - `npm install`
-   - `npm run dev`
+   - `npm run dev/npx next dev -H 127.0.0.1`
 4. **n8n**: Import file `n8n/workflow.json` ke dalam n8n dashboard (http://localhost:5678).
 
 ## 📄 Struktur Folder
