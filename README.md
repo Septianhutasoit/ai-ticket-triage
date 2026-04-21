@@ -1,62 +1,63 @@
 # AI-Powered Support Ticket Triage System
 
-Sistem otomatisasi triage tiket menggunakan AI (Llama 3 via Groq) untuk mengklasifikasikan tingkat urgensi tiket support secara real-time.
+Sistem otomatisasi triage tiket support berbasis AI yang mampu menerima tiket, melakukan klasifikasi tingkat urgensi secara otomatis menggunakan LLM Agent, dan menampilkan hasilnya melalui dashboard real-time. Proyek ini dibangun untuk memenuhi kriteria Technical Assessment Junior Developer.
 
 ## 🚀 Fitur Utama
-- **Automated Triage**: Menganalisis tiket menggunakan LLM Agent.
-- **Real-time Dashboard**: Polling otomatis untuk memantau status analisis.
-- **Dynamic Badging**: Klasifikasi warna berdasarkan tingkat urgensi (Critical, High, Medium, Low).
-- **Audit Logs**: Melacak perubahan status tiket melalui System Logs.
+- **Automated AI Triage**: Klasifikasi otomatis tingkat urgensi (Low, Medium, High, Critical) menggunakan Cohere Command-R LLM.
+- **Real-time Dashboard**: Monitoring status tiket (Pending -> Analyzed) dengan fitur Live Polling otomatis.
+- **AI Reasoning**: Penjelasan logis dari AI untuk setiap klasifikasi yang dilakukan.
+- **Modern UI/UX**: Dashboard responsif dengan Dark Mode, badge warna dinamis, dan fitur "Read More" untuk deskripsi panjang.
+- **System Logging**: Pencatatan setiap aktivitas sistem untuk audit dan monitoring.
 
 ## 🛠️ Tech Stack
-- **Frontend**: Next.js (App Router), Tailwind CSS.
-- **Backend**: FastAPI (Python), SQLAlchemy ORM.
-- **Database**: MySQL 8.0.
-- **Automation**: n8n (Workflow Engine).
-- **AI Model**: LLaMA 3.3 70B via Groq API.
+- **Frontend**: Next.js 15 (App Router), Tailwind CSS, TypeScript.
+- **Backend**: FastAPI (Python 3.13), SQLAlchemy ORM, Pydantic.
+- **Database**: MySQL 8.0 (Containerized).
+- **Workflow Automation**: n8n (Containerized).
+- **LLM Agent**: Cohere AI (Model: `command-r-08-2024`).
 
-## 📦 Cara Install & Menjalankan
-1. **Infrastructure**: Jalankan `docker compose up -d`.
-2. **Backend**:
-   - `cd backend`
-   - `python -m venv venv && .\venv\Scripts\activate`
-   - .\venv\Scripts\Activate.ps1
-   - `pip install -r requirements.txt`
-   - `uvicorn app.main:app --reload`
-3. **Frontend**:
-   - `cd frontend`
-   - `npm install`
-   - `npm run dev/npx next dev -H 127.0.0.1`
-4. **n8n**: Import file `n8n/workflow.json` ke dalam n8n dashboard (http://localhost:5678).
+## 📊 Physical Data Model (PDM)
+Tabel Utama: **`tickets`**
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `id` | INT (PK) | Primary Key, Auto Increment. |
+| `title` | VARCHAR(255)| Judul tiket masalah. |
+| `description` | TEXT | Detail deskripsi masalah. |
+| `submitted_by` | VARCHAR(255)| Nama/Email pelapor. |
+| `status` | ENUM | `pending` atau `analyzed`. |
+| `urgency_level`| VARCHAR(50) | Klasifikasi AI (Low, Medium, High, Critical). |
+| `severity_score`| INT | Skor tingkat keparahan 1-100. |
+| `reasoning` | TEXT | Penjelasan logis hasil analisis AI. |
+| `created_at` | TIMESTAMP | Waktu pembuatan tiket. |
 
-## 📄 Struktur Folder
-- `backend/app/models`: Skema Database SQLAlchemy.
-- `backend/app/schemas`: Validasi Pydantic.
-- `backend/app/routes`: Endpoint API FastAPI.
-- `n8n/`: File ekspor workflow otomasi.
+## 🔄 Activity Diagram (System Flow)
+1. **User** mengisi form tiket di **Next.js Frontend**.
+2. **FastAPI** menerima request, menyimpan data ke **MySQL** (`status: pending`), dan mengirim trigger **Webhook** ke n8n.
+3. **n8n Workflow** menerima data tiket dan mengirimkan kontennya ke **Cohere AI** dengan prompt terstruktur.
+4. **LLM Agent** menghasilkan output JSON berupa tingkat urgensi, skor, dan alasan analisis.
+5. **n8n** melakukan callback **PATCH** ke endpoint FastAPI.
+6. **FastAPI** mengupdate data di database dan mengubah status menjadi `analyzed`.
+7. **Next.js Dashboard** memperbarui tampilan secara otomatis melalui **Live Polling**.
 
-  # AI Support Ticket Triage System
+## 📦 Panduan Instalasi & Penggunaan
 
-Sistem klasifikasi tiket support otomatis menggunakan AI Llama 3 (via Cohere).
+### 1. Prasyarat
+- Docker & Docker Desktop terinstal.
+- Python 3.13+ terinstal.
+- Node.js terinstal.
 
-## 🚀 Cara Setup
-1. **Infrastruktur**: Jalankan `docker compose up -d` untuk menyalakan MySQL dan n8n.
-2. **Backend**: 
-   - Masuk ke folder `backend`, aktifkan venv.
-   - Jalankan `pip install -r requirements.txt`.
-   - Jalankan `python -m uvicorn app.main:app --reload`.
-3. **Frontend**:
-   - Masuk ke folder `frontend`.
-   - Jalankan `npm install` lalu `npm run dev`.
-4. **n8n**: Import `n8n/workflow.json` ke dashboard n8n (localhost:5678).
+### 2. Setup Infrastruktur (Docker)
+Jalankan MySQL dan n8n dalam satu perintah:
+```bash
+docker-compose up -d
 
-## 🛠 Tech Stack
-- FastAPI (Python)
-- Next.js (React)
-- MySQL 8.0
-- n8n Automation
-- Cohere AI (Model: command-r-08-2024)
+## 📸 Dokumentasi Sistem
 
-## 👤 Akun Demo
-- **User Dashboard**: http://localhost:3000
-- **API Documentation**: http://localhost:8000/docs
+### Dashboard Utama (Next.js)
+![Dashboard UI](screenshots/dashboard.png)
+
+### Otomasi Workflow (n8n)
+![n8n Workflow](screenshots/n8n-flow.png)
+
+### Dokumentasi API (FastAPI Swagger)
+![Swagger UI](screenshots/swagger.png)
